@@ -83,6 +83,9 @@ func RegisterAdminRoutes(
 		// API Key 管理
 		registerAdminAPIKeyRoutes(admin, h)
 
+		// Remote Codex service-to-service integration
+		registerRemoteCodexIntegrationRoutes(admin, h)
+
 		// 定时测试计划
 		registerScheduledTestRoutes(admin, h)
 
@@ -118,6 +121,18 @@ func registerAdminAPIKeyRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 	apiKeys := admin.Group("/api-keys")
 	{
 		apiKeys.PUT("/:id", h.Admin.APIKey.UpdateGroup)
+	}
+}
+
+func registerRemoteCodexIntegrationRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
+	remoteCodex := admin.Group("/integrations/remote-codex")
+	{
+		remoteCodex.POST("/users/ensure", h.Admin.RemoteCodex.EnsureUser)
+		remoteCodex.POST("/users/:user_id/balance/ensure", h.Admin.RemoteCodex.EnsureUserBalance)
+		remoteCodex.POST("/users/:user_id/keys/ensure", h.Admin.RemoteCodex.EnsureSandboxKey)
+		remoteCodex.POST("/users/:user_id/keys/:key_id/rotate", h.Admin.RemoteCodex.RotateSandboxKey)
+		remoteCodex.POST("/users/:user_id/keys/:key_id/revoke", h.Admin.RemoteCodex.RevokeSandboxKey)
+		remoteCodex.GET("/usage/export", h.Admin.RemoteCodex.ExportUsage)
 	}
 }
 
